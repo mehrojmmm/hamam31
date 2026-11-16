@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function adminDoc(uid) { return /databases/$(database)/documents/admins/$(uid); }
+    function isAdmin() { return signedIn() && exists(adminDoc(request.auth.uid)); }
+    function isOwner() { return isAdmin() && get(adminDoc(request.auth.uid)).data.role == 'owner'; }
+    function validAdmin() {
+      return request.resource.data.keys().hasOnly(['username', 'role', 'createdAt', 'createdBy'])
+        && request.resource.data.username is string
+        && request.resource.data.role in ['admin', 'owner'];
+    }
+
+    // Steam status: everyone reads, any admin writes.
+    match /public/status {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.events is list
+        && request.resource.data.events.size() <= 200;
+    }
+
+    // Admin list: you read your own record, the main admin (owner) manages all of them.
+    match /admins/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isOwner());
+      allow create: if validAdmin() && (
+        isOwner()
+        // one-time bootstrap of the very first owner, together with /meta/owner
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.role == 'owner'
+            && !exists(/databases/$(database)/documents/meta/owner)
+            && getAfter(/databases/$(database)/documents/meta/owner).data.uid == uid)
+      );
+      allow update: if isOwner() && validAdmin();
+      allow delete: if isOwner() && uid != request.auth.uid;
+    }
+
+    // Marks that the first owner exists; can be created only once.
+    match /meta/owner {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && existsAfter(adminDoc(request.auth.uid));
+    }
+  }
+}

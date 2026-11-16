@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hamam 31 — панель</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2A1D14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='9' fill='%23BF4F17'/%3E%3Cpath d='M12 23c-2-2.5 2-4.5 0-7.5M17 23c-2-2.5 2-4.5 0-7.5M22 23c-2-2.5 2-4.5 0-7.5' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script type="module" src="js/admin.js"></script>
+</head>
+<body class="admin-page">
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Hamam 31 — сайт для гостей">
+      <svg class="brand__mark" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="var(--heat)"/><path d="M12 23c-2-2.5 2-4.5 0-7.5M17 23c-2-2.5 2-4.5 0-7.5M22 23c-2-2.5 2-4.5 0-7.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M8 26h18" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <span class="brand__name">HAMAM <b>31</b></span>
+      <span class="brand__tag">панель</span>
+    </a>
+    <div class="who" id="who" hidden>
+      <span class="busy" id="busy" hidden>Сохраняем…</span>
+      <span>Вы вошли как <b id="who-name"></b></span>
+      <button class="btn btn--onhero btn--sm" type="button" id="logout">Выйти</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Loading -->
+  <div class="center-note" id="view-loading">
+    <p class="eyebrow">Hamam 31</p>
+    <p>Загружаем панель…</p>
+  </div>
+
+  <!-- Not configured -->
+  <div class="center-note wrap" id="view-setup" hidden>
+    <h1 style="font-size:24px">Панель ещё не подключена к базе</h1>
+    <p style="color:var(--muted)">Нужно заполнить настройки Firebase в файле js/config.js.</p>
+  </div>
+
+  <!-- Login -->
+  <div class="login wrap" id="view-login" hidden>
+    <form class="card" id="login-form" novalidate>
+      <div class="eyebrow">Только для персонала</div>
+      <h1>Вход в панель</h1>
+      <p class="m">Здесь отмечают обновления пара. Логин и пароль выдаёт управляющий.</p>
+      <div class="err" id="login-err" hidden></div>
+      <div class="field">
+        <label for="login-user">Логин</label>
+        <input class="inp" type="text" id="login-user" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+      </div>
+      <div class="field">
+        <label for="login-pass">Пароль</label>
+        <input class="inp" type="password" id="login-pass" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn--heat btn--block" type="submit" id="login-btn">Войти</button>
+      <p style="margin-top:16px;font-size:14px;color:var(--muted)"><a href="./" style="color:inherit">← На сайт для гостей</a></p>
+    </form>
+  </div>
+
+  <!-- No access -->
+  <div class="center-note wrap" id="view-denied" hidden>
+    <h1 style="font-size:24px">У этого логина нет доступа</h1>
+    <p style="color:var(--muted)">Возможно, управляющий удалил его из списка администраторов. Обратитесь к управляющему.</p>
+    <button class="btn btn--ghost" type="button" id="denied-logout">Войти под другим логином</button>
+  </div>
+
+  <!-- Panel -->
+  <div class="wrap admin-wrap" id="view-panel" hidden>
+    <div class="admin__head">
+      <div>
+        <div class="eyebrow">Управление паром</div>
+        <h1>Что сейчас видят гости</h1>
+      </div>
+      <a class="btn btn--ghost btn--sm" href="./" target="_blank" rel="noopener">Открыть сайт для гостей</a>
+    </div>
+
+    <div class="mini" id="mini" data-kind="closed">
+      <span class="mini__dot" aria-hidden="true"></span>
+      <div><b id="mini-title">—</b><p class="num" id="mini-line"></p></div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="card">
+        <h2>Начать прямо сейчас</h2>
+        <p class="m">Одно нажатие — и гости сразу увидят, что пар обновляется и когда можно заходить.</p>
+        <div class="quick">
+          <button class="qbtn" type="button" data-quick="full">
+            <span class="qbtn__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 20c-2.5-3 2.5-5.5 0-9M12 20c-2.5-3 2.5-5.5 0-9M17 20c-2.5-3 2.5-5.5 0-9M7 6c-1-1.2 1-2.2 0-3.5M12 6c-1-1.2 1-2.2 0-3.5M17 6c-1-1.2 1-2.2 0-3.5"/></svg></span>
+            <span><b>Полное обновление пара</b><span id="q-full-sub" class="num">Вход закроется примерно на час</span></span>
+          </button>
+          <button class="qbtn qbtn--mid" type="button" data-quick="mid">
+            <span class="qbtn__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 20c-2.5-3 2.5-5.5 0-9M15 20c-2.5-3 2.5-5.5 0-9"/><circle cx="12" cy="6" r="3"/></svg></span>
+            <span><b>Промежуточный пар</b><span id="q-mid-sub" class="num">Вход закроется примерно на 15 минут</span></span>
+          </button>
+        </div>
+      </div>
+
+      <form class="card" id="ev-form" novalidate>
+        <h2>Запланировать на время</h2>
+        <p class="m">Если обновление начнётся позже или уже началось несколько минут назад.</p>
+        <div class="field">
+          <span class="lbl">Что будет</span>
+          <div class="seg" role="radiogroup" aria-label="Тип обновления">
+            <input type="radio" name="ev-type" id="ev-type-full" value="full" checked><label for="ev-type-full">Полное</label>
+            <input type="radio" name="ev-type" id="ev-type-mid" value="mid"><label for="ev-type-mid">Промежуточное</label>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="ev-time">Начало (сегодня)</label>
+            <input class="inp num" type="time" id="ev-time" required>
+          </div>
+          <div class="field">
+            <label for="ev-dur">Вход закрыт, мин</label>
+            <input class="inp num" type="number" id="ev-dur" min="1" max="240" step="1" inputmode="numeric" required>
+          </div>
+        </div>
+        <div class="preview num" id="ev-preview">Следующий заход в баню — в …</div>
+        <button class="btn btn--heat btn--block" type="submit">Добавить и показать гостям</button>
+      </form>
+
+      <div class="card wide">
+        <h2>Сегодня и дальше</h2>
+        <p class="m">Можно закончить раньше, продлить или удалить ошибочную запись.</p>
+        <ul class="alist" id="ev-list"></ul>
+      </div>
+
+      <form class="card" id="settings-form" novalidate>
+        <h2>Настройки</h2>
+        <p class="m">Сколько минут предлагать по умолчанию и объявление для гостей.</p>
+        <div class="row2">
+          <div class="field">
+            <label for="set-full">Полное, мин</label>
+            <input class="inp num" type="number" id="set-full" min="5" max="240" step="5" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="set-mid">Промежуточное, мин</label>
+            <input class="inp num" type="number" id="set-mid" min="1" max="120" step="1" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label for="set-notice">Объявление на главной</label>
+          <input class="inp" type="text" id="set-notice" maxlength="160" placeholder="Например: сегодня пар с эвкалиптом">
+          <small>Оставьте пустым, чтобы убрать объявление.</small>
+        </div>
+        <button class="btn btn--block" type="submit">Сохранить настройки</button>
+      </form>
+
+      <form class="card" id="pass-form" novalidate>
+        <h2>Мой пароль</h2>
+        <p class="m">Смените пароль, который вам выдали, на свой.</p>
+        <div class="field">
+          <label for="pass-old">Текущий пароль</label>
+          <input class="inp" type="password" id="pass-old" autocomplete="current-password">
+        </div>
+        <div class="field">
+          <label for="pass-new">Новый пароль</label>
+          <input class="inp" type="password" id="pass-new" autocomplete="new-password" minlength="8">
+          <small>Не короче 8 символов.</small>
+        </div>
+        <button class="btn btn--ghost btn--block" type="submit">Сменить пароль</button>
+      </form>
+
+      <div class="card wide" id="admins-card" hidden>
+        <h2>Администраторы</h2>
+        <p class="m">Добавьте сотрудника: придумайте ему логин и пароль и отправьте их ему. Он сможет отмечать пар. «Главный» ещё и управляет этим списком.</p>
+        <div class="admin-grid">
+          <form id="add-form" novalidate>
+            <div class="field">
+              <label for="add-user">Логин</label>
+              <input class="inp" type="text" id="add-user" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="например: banshik">
+              <small>Латинские буквы, цифры, точка, дефис или подчёркивание. 3–32 символа.</small>
+            </div>
+            <div class="field">
+              <label for="add-pass">Пароль</label>
+              <div class="inp-row">
+                <input class="inp" type="text" id="add-pass" autocomplete="off" spellcheck="false" minlength="8">
+                <button class="btn btn--ghost btn--sm" type="button" id="add-gen" style="min-height:48px">Придумать</button>
+              </div>
+              <small>Не короче 8 символов. Сотрудник сможет сменить его сам.</small>
+            </div>
+            <div class="field">
+              <span class="lbl">Права</span>
+              <div class="seg" role="radiogroup" aria-label="Права">
+                <input type="radio" name="add-role" id="add-role-admin" value="admin" checked><label for="add-role-admin">Отмечает пар</label>
+                <input type="radio" name="add-role" id="add-role-owner" value="owner"><label for="add-role-owner">Главный</label>
+              </div>
+            </div>
+            <button class="btn btn--block" type="submit">Добавить администратора</button>
+            <div class="creds" id="creds" hidden>
+              <b>Готово. Отправьте сотруднику эти данные:</b>
+              <pre id="creds-text"></pre>
+              <div class="acts">
+                <button class="btn btn--sm" type="button" id="creds-share">Отправить</button>
+                <button class="btn btn--ghost btn--sm" type="button" id="creds-copy">Скопировать</button>
+              </div>
+            </div>
+          </form>
+          <div>
+            <ul class="alist" id="admins-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

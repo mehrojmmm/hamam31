@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hamam 31 — баня</title>
+<meta name="description" content="Баня Hamam 31: когда обновляют пар и когда следующий заход, расписание, цены и правила.">
+<meta name="theme-color" content="#2A1D14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='9' fill='%23BF4F17'/%3E%3Cpath d='M12 23c-2-2.5 2-4.5 0-7.5M17 23c-2-2.5 2-4.5 0-7.5M22 23c-2-2.5 2-4.5 0-7.5' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script type="module" src="js/guest.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#now" data-scroll="now" aria-label="Hamam 31 — наверх">
+      <svg class="brand__mark" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="var(--heat)"/><path d="M12 23c-2-2.5 2-4.5 0-7.5M17 23c-2-2.5 2-4.5 0-7.5M22 23c-2-2.5 2-4.5 0-7.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M8 26h18" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <span class="brand__name">HAMAM <b>31</b></span>
+    </a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#today" data-scroll="today">Пар сегодня</a>
+      <a href="#schedule" data-scroll="schedule">Расписание</a>
+      <a href="#shop" data-scroll="shop">Магазин</a>
+      <a href="#rules" data-scroll="rules">Правила</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero" id="now">
+    <div class="steam" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="wrap">
+      <div>
+        <h1 class="hero__title">Hamam <span>31</span></h1>
+        <p class="hero__lead">Смотрите здесь, когда обновляют пар и когда следующий заход в баню. Не придётся ждать у двери.</p>
+        <div class="hero__facts">
+          <span class="fact">Пт · Сб · Вс</span>
+          <span class="fact num">08:00 — 22:00</span>
+          <span class="fact">4–5 обновлений пара в день</span>
+        </div>
+      </div>
+      <div>
+        <div class="notice" id="notice" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"/></svg>
+          <span id="notice-text"></span>
+        </div>
+        <div class="status" id="status" data-kind="loading" aria-live="polite">
+          <span class="pill">Загружаем статус пара…</span>
+          <div class="status__label">Секунду</div>
+          <div class="status__time">--:--</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="today">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">Обновляется в реальном времени</div>
+          <h2>Пар сегодня</h2>
+        </div>
+        <p>Пар обновляют не по часам: банщик смотрит, сколько гостей и как держится жар. Время появляется здесь, как только его отметили.</p>
+      </div>
+      <div class="card tl" id="timeline"></div>
+    </div>
+  </section>
+
+  <section id="schedule" class="tight">
+    <div class="wrap cols">
+      <div class="card">
+        <div class="eyebrow">Режим работы</div>
+        <h2 style="font-size:26px;margin-top:6px">Расписание</h2>
+        <ul class="week num" id="week">
+          <li class="off" data-day="1"><span class="d">Понедельник</span><span class="h">выходной</span></li>
+          <li class="off" data-day="2"><span class="d">Вторник</span><span class="h">выходной</span></li>
+          <li class="off" data-day="3"><span class="d">Среда</span><span class="h">выходной</span></li>
+          <li class="off" data-day="4"><span class="d">Четверг</span><span class="h">выходной</span></li>
+          <li class="on" data-day="5"><span class="d">Пятница</span><span class="h">08:00 — 22:00</span></li>
+          <li class="on" data-day="6"><span class="d">Суббота</span><span class="h">08:00 — 22:00</span></li>
+          <li class="on" data-day="0"><span class="d">Воскресенье</span><span class="h">08:00 — 22:00</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Как это устроено</div>
+        <h2 style="font-size:26px;margin-top:6px">Как обновляют пар</h2>
+        <ol class="cycle">
+          <li><div><h3>Полное обновление — около часа</h3><p>Парилку проветривают, прогревают и дают свежий пар. В это время заходить нельзя: жар и пар сильнее обычного.</p></div></li>
+          <li><div><h3>Парьтесь на свежем паре</h3><p>Сразу после обновления пар самый лёгкий и сильный. Лучшее время для первого захода.</p></div></li>
+          <li><div><h3>Промежуточный пар — 10–15 минут</h3><p>Между полными обновлениями 1–2 раза поддают пар, чтобы он не остывал. Вход закрыт ненадолго.</p></div></li>
+        </ol>
+        <p class="tip">За день так проходит 4–5 полных обновлений. Перед дорогой загляните на эту страницу: время ближайшего захода будет вверху.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="shop" class="tight">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">Можно купить на месте</div>
+          <h2>Магазин</h2>
+        </div>
+        <p>Забыли что-то дома — не страшно. Всё нужное для бани есть у администратора. Цены в сомони.</p>
+      </div>
+      <div class="shop">
+        <div class="card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM6 10v10M18 10v10M6 15h12"/></svg>Для бани</h3>
+          <ul class="price">
+            <li><span class="n">Накидка для парилки<small>выдаём на время посещения</small></span><span class="dots"></span><span class="p free">бесплатно</span></li>
+            <li><span class="n">Полотенце</span><span class="dots"></span><span class="p num">50<span>смн</span></span></li>
+            <li><span class="n">Веник</span><span class="dots"></span><span class="p num">30<span>смн</span></span></li>
+            <li><span class="n">Замок для шкафчика</span><span class="dots"></span><span class="p num">20<span>смн</span></span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v3l2 2v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8l2-2z"/><path d="M7 12h10"/></svg>Гигиена</h3>
+          <ul class="price">
+            <li><span class="n">Шампунь</span><span class="dots"></span><span class="p num">30<span>смн</span></span></li>
+            <li><span class="n">Мыло</span><span class="dots"></span><span class="p num">20<span>смн</span></span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h13v5a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z"/><path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M12 3v3"/></svg>Напитки</h3>
+          <ul class="price">
+            <li><span class="n">Чай</span><span class="dots"></span><span class="p num">3<span>смн</span></span></li>
+            <li><span class="n">Шиповник</span><span class="dots"></span><span class="p num">5<span>смн</span></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="shop-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+        <span>Накидку выдаём бесплатно и забираем при выходе. Если накидка потерялась, её стоимость — <b class="num">20 смн</b>.</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules" class="tight">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">Для всех гостей</div>
+          <h2>Правила и гигиена</h2>
+        </div>
+        <p>Простые правила, чтобы в бане было чисто, безопасно и приятно всем.</p>
+      </div>
+      <div class="rules">
+        <div class="card rule rule--key">
+          <div class="rule__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM6 10v10M18 10v10M6 15h12"/></svg></div>
+          <h3>Без полотенца и накидки — нельзя</h3>
+          <p>В парилку заходят только в накидке и с полотенцем. Садитесь и ложитесь на полок только на своё полотенце. Накидку выдаём бесплатно.</p>
+        </div>
+        <div class="card rule">
+          <div class="rule__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 4h4a8 8 0 0 1 8 8M8 4v3M7 13v2M11 15v2M15 15v2M9 18v2M13 19v2"/></svg></div>
+          <h3>Сначала душ</h3>
+          <p>Перед первым заходом примите душ и смойте косметику, крем и духи. Масла и скрабы — только в душевой.</p>
+        </div>
+        <div class="card rule">
+          <div class="rule__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 17c0-5 2-11 6-11s4 4 4 7-1 4 2 4 3 3 0 3H7c-1 0-2-1-2-3z"/></svg></div>
+          <h3>Сланцы обязательны</h3>
+          <p>По мокрому полу ходите только в резиновых тапочках: так не поскользнуться и не подхватить грибок.</p>
+        </div>
+        <div class="card rule rule--key">
+          <div class="rule__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Не входите во время обновления</h3>
+          <p>Пока обновляют пар, дверь в парилку закрыта. Время следующего захода всегда видно вверху этой страницы.</p>
+        </div>
+        <div class="card rule">
+          <div class="rule__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg></div>
+          <h3>Берегите здоровье</h3>
+          <p>Один заход — 5–15 минут, между заходами отдыхайте и пейте воду. Плохо себя почувствовали — выйдите и скажите персоналу. При болезнях сердца, давлении и беременности посоветуйтесь с врачом.</p>
+        </div>
+        <div class="card rule">
+          <div class="rule__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg></div>
+          <h3>Без алкоголя</h3>
+          <p>В бане нельзя распивать спиртное и заходить в парилку нетрезвым. Дети — только вместе со взрослыми.</p>
+        </div>
+      </div>
+      <div class="card bring">
+        <div>
+          <div class="eyebrow">Чек-лист</div>
+          <h3 style="margin-top:6px">Что взять с собой</h3>
+        </div>
+        <ul>
+          <li class="must"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Полотенце — обязательно</li>
+          <li class="must"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Сланцы</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Банная шапка</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Мочалка и шампунь</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Вода</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Сменное бельё</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><strong>HAMAM 31</strong> · баня · пятница — воскресенье, 08:00–22:00</span>
+    <a href="admin.html">Для персонала</a>
+  </div>
+</footer>
+</body>
+</html>
