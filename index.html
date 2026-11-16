@@ -37,8 +37,8 @@
         <h1 class="hero__title">Hamam <span>31</span></h1>
         <p class="hero__lead">Смотрите здесь, когда обновляют пар и когда следующий заход в баню. Не придётся ждать у двери.</p>
         <div class="hero__facts">
-          <span class="fact">Пт · Сб · Вс</span>
-          <span class="fact num">08:00 — 22:00</span>
+          <span class="fact" id="fact-days">Пт · Сб · Вс</span>
+          <span class="fact num" id="fact-hours">08:00 — 22:00</span>
           <span class="fact">4–5 обновлений пара в день</span>
         </div>
       </div>
@@ -83,6 +83,10 @@
           <li class="on" data-day="6"><span class="d">Суббота</span><span class="h">08:00 — 22:00</span></li>
           <li class="on" data-day="0"><span class="d">Воскресенье</span><span class="h">08:00 — 22:00</span></li>
         </ul>
+        <div class="specials" id="specials" hidden>
+          <h3>Особые дни</h3>
+          <ul id="specials-list"></ul>
+        </div>
       </div>
       <div class="card">
         <div class="eyebrow">Как это устроено</div>
@@ -199,7 +203,7 @@
 
 <footer>
   <div class="wrap">
-    <span><strong>HAMAM 31</strong> · баня · пятница — воскресенье, 08:00–22:00</span>
+    <span><strong>HAMAM 31</strong> · баня · <span id="foot-hours">Пт · Сб · Вс, 08:00 — 22:00</span></span>
     <a href="admin.html">Для персонала</a>
   </div>
 </footer>

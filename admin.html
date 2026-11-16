@@ -130,6 +130,64 @@
         <ul class="alist" id="ev-list"></ul>
       </div>
 
+      <div class="card wide" id="sched-card">
+        <h2>Расписание</h2>
+        <p class="m">Обычные часы работы и особые дни. Можно открыть баню в будний день или объявить праздник выходным — гости сразу увидят это на сайте.</p>
+
+        <div class="today-ctl" id="today-ctl">
+          <div><b id="today-title">Сегодня</b><p id="today-line"></p></div>
+          <div class="acts">
+            <button class="btn btn--sm" type="button" data-act="today-open" id="today-open">Открыть баню сегодня</button>
+            <button class="btn btn--danger btn--sm" type="button" data-act="today-close" id="today-close">Закрыть сегодня</button>
+            <button class="btn btn--ghost btn--sm" type="button" data-act="today-reset" id="today-reset">Вернуть обычный график</button>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <form id="week-form" novalidate>
+            <h3 class="sub-h">Обычная неделя</h3>
+            <div class="wk" id="wk-rows"></div>
+            <button class="btn btn--block" type="submit">Сохранить обычную неделю</button>
+          </form>
+
+          <div>
+            <form id="sp-form" novalidate>
+              <h3 class="sub-h">Особый день</h3>
+              <div class="row2">
+                <div class="field">
+                  <label for="sp-date">Дата</label>
+                  <input class="inp num" type="date" id="sp-date">
+                </div>
+                <div class="field">
+                  <span class="lbl">Баня</span>
+                  <div class="seg" role="radiogroup" aria-label="Работает ли баня">
+                    <input type="radio" name="sp-mode" id="sp-mode-closed" value="closed" checked><label for="sp-mode-closed">Выходной</label>
+                    <input type="radio" name="sp-mode" id="sp-mode-open" value="open"><label for="sp-mode-open">Открыта</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row2" id="sp-times" hidden>
+                <div class="field">
+                  <label for="sp-from">Открытие</label>
+                  <input class="inp num" type="time" id="sp-from" value="08:00">
+                </div>
+                <div class="field">
+                  <label for="sp-to">Закрытие</label>
+                  <input class="inp num" type="time" id="sp-to" value="22:00">
+                </div>
+              </div>
+              <div class="field">
+                <label for="sp-note">Подпись для гостей (необязательно)</label>
+                <input class="inp" type="text" id="sp-note" maxlength="80" placeholder="Например: Навруз, санитарный день">
+              </div>
+              <button class="btn btn--block" type="submit">Добавить особый день</button>
+            </form>
+            <h3 class="sub-h" style="margin-top:20px">Ближайшие особые дни</h3>
+            <ul class="alist" id="sp-list"></ul>
+          </div>
+        </div>
+      </div>
+
       <form class="card" id="settings-form" novalidate>
         <h2>Настройки</h2>
         <p class="m">Сколько минут предлагать по умолчанию и объявление для гостей.</p>

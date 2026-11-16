@@ -9,6 +9,7 @@ import {
 import { firebaseConfig, LOGIN_DOMAIN } from "./config.js";
 import {
   $, esc, fmt, pad, endOf, sameDay, typeName, normalize, sortedEvents, statusView, toast, configReady, MONTHS,
+  hoursFor, dateKey, keyToMs, nextOpening, dayLabel, hoursText, DAY_TITLE, DAY_SHORT, WEEK_ORDER, HM_RE, DATE_RE,
 } from "./common.js";
 
 const VIEWS = ["view-loading", "view-setup", "view-login", "view-denied", "view-panel"];
@@ -91,8 +92,10 @@ function setBusy(on) {
   for (const b of $("view-panel").querySelectorAll("button")) b.disabled = on;
 }
 function prune(s) {
-  const cutoff = Date.now() - 2 * 86400000;
+  const cutoff = Date.now() - 3 * 86400000;
   s.events = s.events.filter((e) => endOf(e) > cutoff).sort((a, b) => a.start - b.start).slice(-150);
+  const todayKey = dateKey(Date.now());
+  s.specials = s.specials.filter((x) => x.date >= todayKey).sort((a, b) => (a.date < b.date ? -1 : 1)).slice(0, 120);
 }
 async function mutate(fn, okMsg) {
   if (busy || !me) return;
@@ -105,7 +108,10 @@ async function mutate(fn, okMsg) {
       prune(s);
       tx.set(statusRef, {
         events: s.events.map((e) => ({ id: String(e.id), type: e.type, start: e.start, dur: e.dur })),
-        settings: s.settings, notice: s.notice, updatedAt: Date.now(), updatedBy: me.username,
+        settings: s.settings, notice: s.notice,
+        week: s.week.map((d) => ({ open: !!d.open, from: d.from, to: d.to })),
+        specials: s.specials.map((x) => ({ date: x.date, open: !!x.open, from: x.from, to: x.to, note: x.note || "" })),
+        updatedAt: Date.now(), updatedBy: me.username,
       });
     });
     toast(okMsg);
@@ -126,6 +132,43 @@ function fillForms() {
   const d = new Date();
   $("ev-time").value = pad(d.getHours()) + ":" + pad(d.getMinutes());
   syncDur();
+  fillWeek();
+  if (!$("sp-date").value) $("sp-date").value = dateKey(Date.now());
+  $("sp-date").min = dateKey(Date.now());
+}
+function fillWeek() {
+  $("wk-rows").innerHTML = WEEK_ORDER.map((d) => {
+    const w = state.week[d];
+    return '<div class="wk-row' + (w.open ? "" : " off") + '" data-day="' + d + '">' +
+      '<label class="switch"><input type="checkbox" id="wk-open-' + d + '"' + (w.open ? " checked" : "") + ">" + DAY_TITLE[d] + "</label>" +
+      '<div class="wk-times"><input class="inp num" type="time" id="wk-from-' + d + '" value="' + w.from + '" aria-label="' + DAY_TITLE[d] + ', открытие">' +
+      '<span aria-hidden="true">—</span><input class="inp num" type="time" id="wk-to-' + d + '" value="' + w.to + '" aria-label="' + DAY_TITLE[d] + ', закрытие"></div></div>';
+  }).join("");
+}
+
+function renderSchedule(now) {
+  const h = hoursFor(state, now);
+  $("today-title").textContent = "Сегодня, " + DAY_TITLE[new Date(now).getDay()].toLowerCase() + ": " + (h.open ? "работаем " + hoursText(h) : "выходной");
+  const nx = nextOpening(state, now);
+  $("today-line").textContent = h.special
+    ? "Особый день" + (h.note ? " · " + h.note : "") + ". Обычный график на сегодня отменён."
+    : h.open ? "По обычному графику." : "По обычному графику." + (nx ? " Откроемся " + dayLabel(nx, now) + " в " + fmt(nx) + "." : "");
+  const openNow = h.open && now < h.end;
+  $("today-open").hidden = openNow;
+  $("today-close").hidden = !h.open;
+  $("today-reset").hidden = !h.special;
+
+  const todayKey = dateKey(now);
+  const list = state.specials.filter((x) => x.date >= todayKey);
+  $("sp-list").innerHTML = list.length
+    ? list.map((x) => {
+        const d = new Date(keyToMs(x.date));
+        return '<li><span class="t">' + DAY_SHORT[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()] + "</span>" +
+          (x.open ? '<span class="badge badge--owner">открыто ' + x.from + "–" + x.to + "</span>" : '<span class="badge badge--live">выходной</span>') +
+          '<span class="k">' + esc(x.note) + "</span>" +
+          '<span class="acts"><button class="btn btn--danger btn--sm" type="button" data-act="sp-delete" data-id="' + x.date + '">Удалить</button></span></li>';
+      }).join("")
+    : '<li><span class="k">Особых дней нет — работаем по обычной неделе.</span></li>';
 }
 let formsFilled = false;
 function renderPanel() {
@@ -138,6 +181,7 @@ function renderPanel() {
   $("q-full-sub").textContent = "Сейчас, на " + state.settings.fullMin + " мин · заход с " + fmt(now + state.settings.fullMin * 60000);
   $("q-mid-sub").textContent = "Сейчас, на " + state.settings.midMin + " мин · заход с " + fmt(now + state.settings.midMin * 60000);
   renderEvList(now);
+  renderSchedule(now);
 }
 function renderEvList(now) {
   const list = $("ev-list");
@@ -193,7 +237,59 @@ $("view-panel").addEventListener("click", (ev) => {
   } else if (act === "remove-admin") {
     if (!confirmTwice(b, "Точно удалить?")) return;
     removeAdmin(id);
+  } else if (act === "sp-delete") {
+    if (!confirmTwice(b, "Точно удалить?")) return;
+    mutate((s) => { s.specials = s.specials.filter((x) => x.date !== id); }, "Особый день удалён");
+  } else if (act === "today-open") {
+    const now = Date.now(), key = dateKey(now), base = state.week[new Date(now).getDay()];
+    const d = new Date(now); d.setMinutes(Math.floor(d.getMinutes() / 5) * 5, 0, 0);
+    const nowHM = pad(d.getHours()) + ":" + pad(d.getMinutes());
+    const from = base.open && base.from < nowHM ? base.from : nowHM;
+    const to = base.to > nowHM ? base.to : "22:00" > nowHM ? "22:00" : "23:55";
+    mutate((s) => { s.specials = s.specials.filter((x) => x.date !== key); s.specials.push({ date: key, open: true, from, to, note: "" }); },
+      "Баня открыта сегодня до " + to);
+  } else if (act === "today-close") {
+    if (!confirmTwice(b, "Закрыть на сегодня?")) return;
+    const key = dateKey(Date.now());
+    mutate((s) => { s.specials = s.specials.filter((x) => x.date !== key); s.specials.push({ date: key, open: false, from: "08:00", to: "22:00", note: "" }); },
+      "Сегодня баня отмечена как выходной");
+  } else if (act === "today-reset") {
+    const key = dateKey(Date.now());
+    mutate((s) => { s.specials = s.specials.filter((x) => x.date !== key); }, "Сегодня — снова по обычному графику");
   }
+});
+
+/* ---------- schedule forms ---------- */
+$("wk-rows").addEventListener("change", (ev) => {
+  const cb = ev.target.closest('input[type="checkbox"]');
+  if (cb) cb.closest(".wk-row").classList.toggle("off", !cb.checked);
+});
+$("week-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const week = [];
+  for (let d = 0; d < 7; d++) {
+    const open = $("wk-open-" + d).checked, from = $("wk-from-" + d).value, to = $("wk-to-" + d).value;
+    if (open && (!HM_RE.test(from) || !HM_RE.test(to) || from >= to)) { toast(DAY_TITLE[d] + ": время закрытия должно быть позже открытия.", true); return; }
+    week.push({ open, from: HM_RE.test(from) ? from : state.week[d].from, to: HM_RE.test(to) ? to : state.week[d].to });
+  }
+  mutate((s) => { s.week = week; }, "Обычная неделя сохранена");
+});
+function syncSpMode() { $("sp-times").hidden = !$("sp-mode-open").checked; }
+$("sp-mode-open").addEventListener("change", syncSpMode);
+$("sp-mode-closed").addEventListener("change", syncSpMode);
+$("sp-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const date = $("sp-date").value, open = $("sp-mode-open").checked;
+  const from = $("sp-from").value, to = $("sp-to").value, note = $("sp-note").value.trim().slice(0, 80);
+  if (!DATE_RE.test(date)) { toast("Выберите дату.", true); return; }
+  if (date < dateKey(Date.now())) { toast("Эта дата уже прошла.", true); return; }
+  if (open && (!HM_RE.test(from) || !HM_RE.test(to) || from >= to)) { toast("Время закрытия должно быть позже открытия.", true); return; }
+  const d = new Date(keyToMs(date));
+  mutate((s) => {
+    s.specials = s.specials.filter((x) => x.date !== date);
+    s.specials.push({ date, open, from: open ? from : "08:00", to: open ? to : "22:00", note });
+  }, d.getDate() + " " + MONTHS[d.getMonth()] + ": " + (open ? "открыто " + from + "–" + to : "выходной"));
+  $("sp-note").value = "";
 });
 
 const evType = () => ($("ev-type-mid").checked ? "mid" : "full");
